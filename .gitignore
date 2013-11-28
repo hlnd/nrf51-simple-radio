@@ -1,0 +1,6 @@
+_build/
+.*.sw*
+tags
+.gdbinit
+
+

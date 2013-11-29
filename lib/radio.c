@@ -49,6 +49,8 @@ uint32_t radio_init(radio_evt_handler_t * evt_handler)
         4 << RADIO_PCNF1_BALEN_Pos;
 
     NRF_RADIO->FREQUENCY = 40;
+    NRF_RADIO->TIFS = 150;
+    NRF_RADIO->MODE = RADIO_MODE_MODE_Ble_1Mbit << RADIO_MODE_MODE_Pos;
 
     NRF_RADIO->CRCCNF = RADIO_CRCCNF_LEN_Two << RADIO_CRCCNF_LEN_Pos;
 

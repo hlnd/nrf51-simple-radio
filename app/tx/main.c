@@ -8,6 +8,11 @@
 #include "error.h"
 #include "radio.h"
 
+void radio_event_handler(radio_evt_t * evt)
+{
+
+}
+
 int main(void)
 {
     uint8_t i = 0; 
@@ -15,7 +20,7 @@ int main(void)
     radio_packet_t packet;
     packet.len = 4;
 
-    radio_init(NULL);
+    radio_init(radio_event_handler);
 
     NRF_GPIO->DIR = 1 << 18;
 

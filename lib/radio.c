@@ -9,19 +9,18 @@
 
 static radio_evt_handler_t * m_evt_handler;
 
-radio_packet_t m_rx_buffer[RADIO_PACKET_BUFFER_SIZE];
-radio_packet_t m_tx_buffer[RADIO_PACKET_BUFFER_SIZE];
+static radio_packet_t m_rx_buffer[RADIO_PACKET_BUFFER_SIZE];
+static radio_packet_t m_tx_buffer[RADIO_PACKET_BUFFER_SIZE];
 
 void RADIO_IRQHandler(void)
 {
-    if(NRF_RADIO->EVENTS_END)
+    if(NRF_RADIO->EVENTS_DISABLED && (NRF_RADIO->INTENSET & RADIO_INTENSET_DISABLED_Msk))
     {
-        NRF_RADIO->EVENTS_END = 0;
-
-        if (NRF_RADIO->STATE != RADIO_STATE_STATE_Rx)
+        NRF_RADIO->EVENTS_DISABLED = 0; 
+        if (NRF_RADIO->STATE >= RADIO_STATE_STATE_TxRu)
         {
             m_tx_buffer[0].flags.ack = 1;
-            NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_buffer[0];
+            NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_buffer[0];
 
             NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos |
                 RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos |
@@ -29,17 +28,22 @@ void RADIO_IRQHandler(void)
         }
         else
         {
-            radio_packet_t * packet = (radio_packet_t *) NRF_RADIO->PACKETPTR;
-            NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_buffer[0];
+            NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_buffer[0];
 
-            memcpy(&m_rx_buffer[0], packet, sizeof(packet));
-
-            radio_evt_t evt;
-            evt.type = PACKET_RECEIVED;
-            evt.packet = m_rx_buffer[0];
-
-            (*m_evt_handler)(&evt);
+            NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos |
+                RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos |
+                RADIO_SHORTS_DISABLED_TXEN_Enabled << RADIO_SHORTS_DISABLED_TXEN_Pos;
         }
+    }
+    else if(NRF_RADIO->EVENTS_END && (NRF_RADIO->INTENSET & RADIO_INTENSET_END_Msk))
+    {
+        NRF_RADIO->EVENTS_END = 0;
+
+        radio_evt_t evt;
+        evt.type = PACKET_RECEIVED;
+        evt.packet = &m_rx_buffer[0];
+
+        (*m_evt_handler)(&evt);
     }
 }
 
@@ -58,7 +62,8 @@ uint32_t radio_init(radio_evt_handler_t * evt_handler)
     NRF_RADIO->BASE0 = 0xE7E7E7E7;
     NRF_RADIO->PREFIX0 = 0xE7E7E7E7;
 
-    NRF_RADIO->PCNF0 = 8 << RADIO_PCNF0_LFLEN_Pos;
+    NRF_RADIO->PCNF0 = 8 << RADIO_PCNF0_LFLEN_Pos | 
+        1 << RADIO_PCNF0_S0LEN_Pos;
     NRF_RADIO->PCNF1 = 64 << RADIO_PCNF1_MAXLEN_Pos |
         4 << RADIO_PCNF1_BALEN_Pos;
 
@@ -84,6 +89,10 @@ uint32_t radio_send(radio_packet_t * packet)
         RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos |
         RADIO_SHORTS_DISABLED_RXEN_Enabled << RADIO_SHORTS_DISABLED_RXEN_Pos;
 
+    NRF_RADIO->INTENSET = RADIO_INTENSET_END_Enabled << RADIO_INTENSET_END_Pos | 
+        RADIO_INTENSET_DISABLED_Enabled << RADIO_INTENSET_DISABLED_Pos;
+    NVIC_EnableIRQ(RADIO_IRQn);
+
     NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_buffer[0];
     NRF_RADIO->TASKS_TXEN = 1;
 
@@ -100,7 +109,9 @@ uint32_t radio_receive_start(void)
         RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos |
         RADIO_SHORTS_DISABLED_TXEN_Enabled << RADIO_SHORTS_DISABLED_TXEN_Pos;
 
-    NRF_RADIO->INTENSET = RADIO_INTENSET_END_Enabled << RADIO_INTENSET_END_Pos;
+    NRF_RADIO->INTENSET = RADIO_INTENSET_END_Enabled << RADIO_INTENSET_END_Pos | 
+        RADIO_INTENSET_DISABLED_Enabled << RADIO_INTENSET_DISABLED_Pos;
+
     NVIC_EnableIRQ(RADIO_IRQn);
 
     NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_buffer[0];

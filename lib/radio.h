@@ -27,7 +27,7 @@ typedef struct
    radio_evt_type_t type;
    union
    {
-       radio_packet_t packet;
+       radio_packet_t * packet;
    };
 } radio_evt_t;
 

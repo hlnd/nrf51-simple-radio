@@ -14,6 +14,11 @@ typedef enum
 typedef struct
 {
     uint8_t len;
+    struct __attribute__((packed))
+    {
+        uint8_t padding : 7;
+        uint8_t ack : 1;
+    } flags;
     uint8_t data[RADIO_PACKET_MAX_LEN];
 } radio_packet_t;
 

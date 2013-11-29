@@ -18,14 +18,28 @@ void RADIO_IRQHandler(void)
     {
         NRF_RADIO->EVENTS_END = 0;
 
-        radio_packet_t * packet = (radio_packet_t *) NRF_RADIO->PACKETPTR;
-        memcpy(&m_rx_buffer[0], packet, sizeof(packet));
+        if (NRF_RADIO->STATE != RADIO_STATE_STATE_Rx)
+        {
+            m_tx_buffer[0].flags.ack = 1;
+            NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_buffer[0];
 
-        radio_evt_t evt;
-        evt.type = PACKET_RECEIVED;
-        evt.packet = m_rx_buffer[0];
+            NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos |
+                RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos |
+                RADIO_SHORTS_DISABLED_RXEN_Enabled << RADIO_SHORTS_DISABLED_RXEN_Pos;
+        }
+        else
+        {
+            radio_packet_t * packet = (radio_packet_t *) NRF_RADIO->PACKETPTR;
+            NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_buffer[0];
 
-        (*m_evt_handler)(&evt);
+            memcpy(&m_rx_buffer[0], packet, sizeof(packet));
+
+            radio_evt_t evt;
+            evt.type = PACKET_RECEIVED;
+            evt.packet = m_rx_buffer[0];
+
+            (*m_evt_handler)(&evt);
+        }
     }
 }
 
@@ -67,7 +81,8 @@ uint32_t radio_send(radio_packet_t * packet)
     hfclk_start();
 
     NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos |
-        RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos;
+        RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos |
+        RADIO_SHORTS_DISABLED_RXEN_Enabled << RADIO_SHORTS_DISABLED_RXEN_Pos;
 
     NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_buffer[0];
     NRF_RADIO->TASKS_TXEN = 1;
@@ -82,13 +97,13 @@ uint32_t radio_receive_start(void)
     NRF_RADIO->RXADDRESSES = RADIO_RXADDRESSES_ADDR0_Enabled << RADIO_RXADDRESSES_ADDR0_Pos;
 
     NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos |
-        RADIO_SHORTS_END_START_Enabled << RADIO_SHORTS_END_START_Pos;
-
-    NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_buffer[0];
+        RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos |
+        RADIO_SHORTS_DISABLED_TXEN_Enabled << RADIO_SHORTS_DISABLED_TXEN_Pos;
 
     NRF_RADIO->INTENSET = RADIO_INTENSET_END_Enabled << RADIO_INTENSET_END_Pos;
     NVIC_EnableIRQ(RADIO_IRQn);
 
+    NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_buffer[0];
     NRF_RADIO->TASKS_RXEN = 1;
 
     return SUCCESS;

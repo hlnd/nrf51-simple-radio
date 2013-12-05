@@ -7,6 +7,7 @@
 
 #include "error.h"
 #include "gpio.h"
+#include "led.h"
 #include "radio.h"
 
 void radio_evt_handler(radio_evt_t * evt)
@@ -24,11 +25,7 @@ int main(void)
 
     radio_init(radio_evt_handler);
 
-    gpio_pins_cfg_out(21, 24);
-    gpio_pin_set(21);
-    gpio_pin_set(22);
-    gpio_pin_set(23);
-
+    gpio_pins_cfg_out(LED_START, LED_STOP);
 
     while (1)
     {
@@ -36,7 +33,7 @@ int main(void)
         packet.data[1] = 0x12;
         radio_send(&packet);
 
-        gpio_pin_toggle(21);
+        gpio_pin_toggle(LED0);
         nrf_delay_us(1000000);
     }
 }

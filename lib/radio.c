@@ -4,6 +4,8 @@
 #include <string.h>
 
 #include "error.h"
+#include "gpio.h"
+
 #include "nrf51.h"
 #include "nrf51_bitfields.h"
 
@@ -25,8 +27,10 @@ static radio_packet_t m_tx_buffer[RADIO_PACKET_BUFFER_SIZE];
 
 void RADIO_IRQHandler(void)
 {
+    gpio_pin_toggle(0);
     if((NRF_RADIO->EVENTS_END == 1) && (NRF_RADIO->INTENSET & RADIO_INTENSET_END_Msk))
     {
+        gpio_pin_toggle(1);
         NRF_RADIO->EVENTS_END = 0;
 
         switch (m_state)
@@ -70,6 +74,7 @@ void RADIO_IRQHandler(void)
     }
     if ((NRF_RADIO->EVENTS_DISABLED == 1) && (NRF_RADIO->INTENSET & RADIO_INTENSET_DISABLED_Msk))
     {
+        gpio_pin_toggle(2);
         NRF_RADIO->EVENTS_DISABLED = 0; 
 
         switch (m_state)

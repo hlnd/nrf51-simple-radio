@@ -3,6 +3,7 @@
 #include "nrf51.h"
 #include "nrf_delay.h"
 
+#include "gpio.h"
 #include "radio.h"
 
 void radio_evt_handler(radio_evt_t * evt)
@@ -10,9 +11,7 @@ void radio_evt_handler(radio_evt_t * evt)
     switch (evt->type)
     {
         case PACKET_RECEIVED:
-            NRF_GPIO->OUTSET = 1 << 18;
-            nrf_delay_us(100000);
-            NRF_GPIO->OUTCLR = 1 << 18;
+            gpio_pin_toggle(19);
             break;
     }
 }
@@ -23,12 +22,12 @@ int main(void)
 
     radio_receive_start();
 
-    NRF_GPIO->DIR = (1 << 18) | (1 << 19);
+    gpio_pins_cfg_out(18, 20);
+    gpio_pins_cfg_out(0, 8);
+
     while (1)
     {
-        NRF_GPIO->OUTSET = 1 << 19;
-        nrf_delay_us(100000);
-        NRF_GPIO->OUTCLR = 1 << 19;
+        gpio_pin_toggle(18);
         nrf_delay_us(100000);
     }
 }

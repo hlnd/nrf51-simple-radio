@@ -17,7 +17,7 @@ typedef enum
     TX_ACK_RECEIVE,
 } radio_state_t;
 
-static radio_state_t m_state;
+volatile static radio_state_t m_state;
 
 static radio_evt_handler_t * m_evt_handler;
 

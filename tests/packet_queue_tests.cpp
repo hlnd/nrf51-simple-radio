@@ -8,6 +8,9 @@ extern "C"
 
 #include "CppUTest/TestHarness.h"
 
+#include <limits.h>
+#include <string.h>
+
 
 TEST_GROUP(packet_queue)
 {
@@ -32,15 +35,22 @@ TEST(packet_queue, test_queue_init_succeed)
 TEST(packet_queue, test_queue_new_queue_is_empty)
 {
     LONGS_EQUAL(true, packet_queue_is_empty(&queue));
-}
 
-TEST(packet_queue, test_queue_add_queue_is_not_empty)
-{
     radio_packet_t packet;
     packet_queue_add(&queue, &packet);
 
     LONGS_EQUAL(false, packet_queue_is_empty(&queue));
 }
 
+TEST(packet_queue, test_queue_full_queue_is_full)
+{
+    LONGS_EQUAL(false, packet_queue_is_full(&queue));
 
+    for (int i = 0; i < PACKET_QUEUE_SIZE; i++)
+    {
+        radio_packet_t packet;
+        packet_queue_add(&queue, &packet);
+    }
+    LONGS_EQUAL(true, packet_queue_is_full(&queue));
+}
     

@@ -9,8 +9,9 @@ INCLUDE_PATHS += $(CPPUTEST_HOME)/include/
 
 CPPFLAGS = -g $(addprefix -I, $(INCLUDE_PATHS))
 
-CXXFLAGS += -include $(CPPUTEST_HOME)/include/CppUTest/MemoryLeakDetectorNewMacros.h
-CFLAGS += -include $(CPPUTEST_HOME)/include/CppUTest/MemoryLeakDetectorMallocMacros.h
+CXXFLAGS += -include $(CPPUTEST_HOME)/include/CppUTest/MemoryLeakDetectorNewMacros.h 
+CFLAGS += -include $(CPPUTEST_HOME)/include/CppUTest/MemoryLeakDetectorMallocMacros.h 
+LDFLAGS = -L$(CPPUTEST_HOME)/lib/ -lCppUTest -lpthread -lstdc++ 
 
 TARGET = all_tests
 SOURCES_APP = $(wildcard ../lib/*.c)
@@ -19,7 +20,6 @@ OBJECTS_APP = $(SOURCES_APP:.c=.o)
 SOURCES_TESTS = $(wildcard *.cpp) 
 OBJECTS_TESTS = $(SOURCES_TESTS:.cpp=.o) 
 
-LDFLAGS = -L$(CPPUTEST_HOME)/lib/ -lCppUTest -lpthread -lstdc++
 
 all: check
 

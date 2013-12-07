@@ -2,5 +2,6 @@ _build/
 .*.sw*
 tags
 .gdbinit
+*.o
 
 

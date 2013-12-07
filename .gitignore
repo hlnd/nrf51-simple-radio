@@ -2,6 +2,9 @@ _build/
 .*.sw*
 tags
 .gdbinit
+*.jlink
+*.log
 *.o
+tests/all_tests
 
 

@@ -9,8 +9,8 @@
 
 typedef struct
 {
-    radio_packet_t * head;
-    radio_packet_t * tail;
+    uint32_t head;
+    uint32_t tail;
     radio_packet_t packets[PACKET_QUEUE_SIZE];
 } packet_queue_t;
 

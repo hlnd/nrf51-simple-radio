@@ -1,8 +1,11 @@
 #include "packet_queue.h"
 
 #include "error.h"
+#include "radio.h"
 
+#include <math.h>
 #include <stdint.h>
+#include <string.h>
 
 
 uint32_t packet_queue_init(packet_queue_t * queue)
@@ -25,6 +28,9 @@ bool packet_queue_is_full(packet_queue_t * queue)
 
 uint32_t packet_queue_add(packet_queue_t * queue, radio_packet_t * packet)
 {
+    memcpy(&queue->packets[0], packet, sizeof(packet));
+
+    queue->tail++;
 
 }
 

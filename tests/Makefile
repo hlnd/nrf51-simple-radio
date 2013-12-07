@@ -29,7 +29,7 @@ check: $(TARGET)
 	./$(TARGET)
 
 clean:
-	rm -rf *.opp *.o
+	rm -rf $(TARGET) $(OBJECTS_APP) $(OBJECTS_TESTS)
 
 $(TARGET): $(OBJECTS_APP) $(OBJECTS_TESTS)
 	$(CC) $^ -o $@ $(LDFLAGS)

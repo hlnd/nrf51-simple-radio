@@ -3,8 +3,8 @@
 #include "error.h"
 #include "radio.h"
 
-#include <math.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 
@@ -34,7 +34,7 @@ uint32_t packet_queue_add(packet_queue_t * queue, radio_packet_t * packet)
 
 }
 
-uint32_t packet_queue_get(packet_queue_t * queue, radio_packet_t * packet)
+uint32_t packet_queue_get(packet_queue_t * queue, radio_packet_t ** packet)
 {
 
 }

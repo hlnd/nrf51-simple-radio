@@ -72,3 +72,10 @@ TEST(packet_queue, test_queue_add_fails_on_full_queue)
     LONGS_EQUAL(NO_MEMORY, packet_queue_add(&queue, &packet));
 }
 
+TEST(packet_queue, test_queue_get_fails_on_empty_queue)
+{
+    radio_packet_t * packet;
+    LONGS_EQUAL(NOT_FOUND, packet_queue_get(&queue, &packet));
+
+}
+

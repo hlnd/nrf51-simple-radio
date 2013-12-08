@@ -57,7 +57,10 @@ TEST(packet_queue, test_queue_full_queue_is_full)
 TEST(packet_queue, test_queue_add_succeeds_on_empty_queue)
 {
     radio_packet_t packet;
+    packet.data[0] = rand()*INT_MAX;
     LONGS_EQUAL(SUCCESS, packet_queue_add(&queue, &packet));
+
+    LONGS_EQUAL(0, memcmp(&packet, &queue.packets[0], sizeof(packet)));
 }
 
 TEST(packet_queue, test_queue_add_fails_on_full_queue)

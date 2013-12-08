@@ -5,8 +5,8 @@
 
 #include <stdbool.h>
 
-#define PACKET_QUEUE_SIZE 16
-#define PACKET_QUEUE_ELEMENTS 15
+#define PACKET_QUEUE_SIZE 8
+#define PACKET_QUEUE_ELEMENTS (PACKET_QUEUE_SIZE-1)
 
 typedef struct
 {

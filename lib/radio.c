@@ -9,6 +9,26 @@
 #include "nrf51.h"
 #include "nrf51_bitfields.h"
 
+#define PREPARE_TX(x) do \
+    { \
+        NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos | \
+            RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos | \
+            RADIO_SHORTS_DISABLED_TXEN_Enabled << RADIO_SHORTS_DISABLED_TXEN_Pos; \
+    } while(0)
+
+#define PREPARE_RX(x) do \
+    { \
+        NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos | \
+            RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos | \
+            RADIO_SHORTS_DISABLED_RXEN_Enabled << RADIO_SHORTS_DISABLED_RXEN_Pos; \
+    } while(0)
+
+#define PREPARE_DISABLE(x) do \
+    { \
+        NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos | \
+            RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos; \
+    } while(0)
+
 typedef enum
 {
     IDLE,
@@ -109,20 +129,18 @@ void RADIO_IRQHandler(void)
         {
             case TX_PACKET_SEND:
             case RX_ACK_SEND:
-                NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos |
-                    RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos |
-                    RADIO_SHORTS_DISABLED_RXEN_Enabled << RADIO_SHORTS_DISABLED_RXEN_Pos;
+                PREPARE_RX();
                 break;
 
             case RX_PACKET_RECEIVE:
-                NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos |
-                    RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos |
-                    RADIO_SHORTS_DISABLED_TXEN_Enabled << RADIO_SHORTS_DISABLED_TXEN_Pos;
+                PREPARE_TX();
                 break;
 
             case TX_ACK_RECEIVE:
-                NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos |
-                    RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos;
+                if (packet_queue_is_empty(&m_tx_queue))
+                    PREPARE_DISABLE();
+                else
+                    PREPARE_TX();
                 break;
 
             case IDLE:

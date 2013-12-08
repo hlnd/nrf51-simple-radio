@@ -2,8 +2,9 @@
 #define ERROR_H_INCLUDED
 
 #define SUCCESS 0
-#define NO_MEMORY 1
-#define NOT_FOUND 2
+#define ERROR_NO_MEMORY 1
+#define ERROR_NOT_FOUND 2
+#define ERROR_BUSY 3
 
 #define ASSUME_SUCCESS(ERR_CODE) \
     if (ERR_CODE != SUCCESS) \

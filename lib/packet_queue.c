@@ -29,7 +29,7 @@ bool packet_queue_is_full(packet_queue_t * queue)
 uint32_t packet_queue_new(packet_queue_t * queue, radio_packet_t ** packet)
 {
     if (packet_queue_is_full(queue))
-        return NO_MEMORY;
+        return ERROR_NO_MEMORY;
 
     *packet = &queue->packets[queue->tail];
 
@@ -55,7 +55,7 @@ uint32_t packet_queue_add(packet_queue_t * queue, radio_packet_t * packet)
 uint32_t packet_queue_get(packet_queue_t * queue, radio_packet_t ** packet)
 {
     if (packet_queue_is_empty(queue))
-        return NOT_FOUND;
+        return ERROR_NOT_FOUND;
 
     *packet = &queue->packets[queue->head];
 

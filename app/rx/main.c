@@ -5,7 +5,7 @@
 
 #include "error.h"
 #include "gpio.h"
-#include "led.h"
+#include "leds.h"
 #include "radio.h"
 
 void error_handler(uint32_t err_code, uint32_t line_num, char * file_name)
@@ -14,7 +14,7 @@ void error_handler(uint32_t err_code, uint32_t line_num, char * file_name)
     {
         for (uint8_t i = LED_START; i < LED_STOP; i++)
         {
-            gpio_pin_toggle(i);
+            led_toggle(i);
             nrf_delay_us(50000);
         }
     }
@@ -25,7 +25,7 @@ void radio_evt_handler(radio_evt_t * evt)
     switch (evt->type)
     {
         case PACKET_RECEIVED:
-            gpio_pin_toggle(LED1);
+            led_toggle(LED1);
             break;
     }
 }
@@ -36,12 +36,12 @@ int main(void)
 
     radio_receive_start();
 
-    gpio_pins_cfg_out(LED_START, LED_STOP);
+    leds_init();
     gpio_pins_cfg_out(0, 8);
 
     while (1)
     {
-        gpio_pin_toggle(LED0);
+        led_toggle(LED0);
         nrf_delay_us(100000);
     }
 }

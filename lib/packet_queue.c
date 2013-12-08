@@ -52,12 +52,12 @@ uint32_t packet_queue_add(packet_queue_t * queue, radio_packet_t * packet)
     return SUCCESS;
 }
 
-uint32_t packet_queue_get(packet_queue_t * queue, radio_packet_t ** packet)
+uint32_t packet_queue_get(packet_queue_t * queue, radio_packet_t * packet)
 {
     if (packet_queue_is_empty(queue))
         return ERROR_NOT_FOUND;
 
-    *packet = &queue->packets[queue->head];
+    memcpy(packet, &queue->packets[queue->head], sizeof(*packet));
 
     queue->head = (queue->head + 1u) % PACKET_QUEUE_SIZE;
 

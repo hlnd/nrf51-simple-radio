@@ -99,13 +99,13 @@ TEST(packet_queue, test_queue_add_fails_on_full_queue)
     }
 
     radio_packet_t packet;
-    LONGS_EQUAL(NO_MEMORY, packet_queue_add(&queue, &packet));
+    LONGS_EQUAL(ERROR_NO_MEMORY, packet_queue_add(&queue, &packet));
 }
 
 TEST(packet_queue, test_queue_get_fails_on_empty_queue)
 {
-    radio_packet_t * packet;
-    LONGS_EQUAL(NOT_FOUND, packet_queue_get(&queue, &packet));
+    radio_packet_t packet;
+    LONGS_EQUAL(ERROR_NOT_FOUND, packet_queue_get(&queue, &packet));
 
 }
 
@@ -114,10 +114,10 @@ TEST(packet_queue, test_queue_get_returns_correct_pointer)
     radio_packet_t in_packet;
     packet_queue_add(&queue, &in_packet);
 
-    radio_packet_t * out_packet = 0;
+    radio_packet_t out_packet;
     packet_queue_get(&queue, &out_packet);
 
-    POINTERS_EQUAL(out_packet, &queue.packets[0]);
+    LONGS_EQUAL(0, memcmp(&in_packet, &out_packet, sizeof(in_packet)));
 }
 
 TEST(packet_queue, test_queue_add_get_packet)
@@ -126,10 +126,10 @@ TEST(packet_queue, test_queue_add_get_packet)
     in_packet.data[0] = rand()*INT_MAX;
     packet_queue_add(&queue, &in_packet);
 
-    radio_packet_t * out_packet;
+    radio_packet_t out_packet;
     packet_queue_get(&queue, &out_packet);
     
-    LONGS_EQUAL(0, memcmp(&in_packet, out_packet, sizeof(in_packet)));
+    LONGS_EQUAL(0, memcmp(&in_packet, &out_packet, sizeof(in_packet)));
 }
     
 TEST(packet_queue, test_queue_is_fifo)
@@ -142,24 +142,17 @@ TEST(packet_queue, test_queue_is_fifo)
         LONGS_EQUAL(SUCCESS, packet_queue_add(&queue, &in_packets[i]));
     }
 
-    radio_packet_t * out_packets[PACKET_QUEUE_ELEMENTS] = {0};
+    radio_packet_t out_packets[PACKET_QUEUE_ELEMENTS] = {0};
     for (int i = 0; i < PACKET_QUEUE_ELEMENTS; i++)
     {
         LONGS_EQUAL(SUCCESS, packet_queue_get(&queue, &out_packets[i]));
     }
 
-    CHECK(0 != out_packets[0]);
-    LONGS_EQUAL(0, memcmp(out_packets[0], &in_packets[0], sizeof(in_packets[0])));
-    CHECK(0 != out_packets[1]);
-    LONGS_EQUAL(0, memcmp(out_packets[1], &in_packets[1], sizeof(in_packets[1])));
-    CHECK(0 != out_packets[2]);
-    LONGS_EQUAL(0, memcmp(out_packets[2], &in_packets[2], sizeof(in_packets[2])));
-    CHECK(0 != out_packets[3]);
-    LONGS_EQUAL(0, memcmp(out_packets[3], &in_packets[3], sizeof(in_packets[3])));
-    CHECK(0 != out_packets[4]);
-    LONGS_EQUAL(0, memcmp(out_packets[4], &in_packets[4], sizeof(in_packets[4])));
-    CHECK(0 != out_packets[5]);
-    LONGS_EQUAL(0, memcmp(out_packets[5], &in_packets[5], sizeof(in_packets[5])));
-    CHECK(0 != out_packets[6]);
-    LONGS_EQUAL(0, memcmp(out_packets[6], &in_packets[6], sizeof(in_packets[6])));
+    LONGS_EQUAL(0, memcmp(&out_packets[0], &in_packets[0], sizeof(in_packets[0])));
+    LONGS_EQUAL(0, memcmp(&out_packets[1], &in_packets[1], sizeof(in_packets[1])));
+    LONGS_EQUAL(0, memcmp(&out_packets[2], &in_packets[2], sizeof(in_packets[2])));
+    LONGS_EQUAL(0, memcmp(&out_packets[3], &in_packets[3], sizeof(in_packets[3])));
+    LONGS_EQUAL(0, memcmp(&out_packets[4], &in_packets[4], sizeof(in_packets[4])));
+    LONGS_EQUAL(0, memcmp(&out_packets[5], &in_packets[5], sizeof(in_packets[5])));
+    LONGS_EQUAL(0, memcmp(&out_packets[6], &in_packets[6], sizeof(in_packets[6])));
 }

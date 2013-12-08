@@ -25,6 +25,6 @@ uint32_t packet_queue_new(packet_queue_t * queue, radio_packet_t ** packet);
 
 uint32_t packet_queue_add(packet_queue_t * queue, radio_packet_t * packet);
 
-uint32_t packet_queue_get(packet_queue_t * queue, radio_packet_t ** packet);
+uint32_t packet_queue_get(packet_queue_t * queue, radio_packet_t * packet);
 
 #endif

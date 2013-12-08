@@ -63,6 +63,17 @@ TEST(packet_queue, test_queue_add_succeeds_on_empty_queue)
     LONGS_EQUAL(0, memcmp(&packet, &queue.packets[0], sizeof(packet)));
 }
 
+TEST(packet_queue, test_queue_add_succeeds_on_non_empty_queue)
+{
+    radio_packet_t packet;
+    packet_queue_add(&queue, &packet);
+
+    packet.data[0] = rand()*INT_MAX;
+    LONGS_EQUAL(SUCCESS, packet_queue_add(&queue, &packet));
+
+    LONGS_EQUAL(0, memcmp(&packet, &queue.packets[queue.tail-1], sizeof(packet)));
+}
+
 TEST(packet_queue, test_queue_add_fails_on_full_queue)
 {
     for (int i = 0; i < PACKET_QUEUE_SIZE; i++)

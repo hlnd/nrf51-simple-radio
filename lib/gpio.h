@@ -59,9 +59,25 @@ static inline void gpio_pin_set(uint32_t pin)
     NRF_GPIO->OUTSET = 1 << pin;
 }
 
+static inline void gpio_pins_set(uint32_t pin_start, uint32_t pin_end)
+{
+    for (uint32_t pin = pin_start; pin < pin_end; pin++)
+    {
+        gpio_pin_set(pin);
+    }
+}
+
 static inline void gpio_pin_clear(uint32_t pin)
 {
     NRF_GPIO->OUTCLR = 1 << pin;
+}
+
+static inline void gpio_pins_clear(uint32_t pin_start, uint32_t pin_end)
+{
+    for (uint32_t pin = pin_start; pin < pin_end; pin++)
+    {
+        gpio_pin_clear(pin);
+    }
 }
 
 static inline void gpio_pin_toggle(uint32_t pin)

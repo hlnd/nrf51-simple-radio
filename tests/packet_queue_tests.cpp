@@ -11,6 +11,14 @@ extern "C"
 #include <limits.h>
 #include <string.h>
 
+extern "C"
+{
+    void error_handler(uint32_t err_code, uint32_t line_num, char * file_name)
+    {
+
+    }
+}
+
 
 TEST_GROUP(packet_queue)
 {

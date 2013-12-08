@@ -28,16 +28,26 @@ bool packet_queue_is_full(packet_queue_t * queue)
 
 uint32_t packet_queue_new(packet_queue_t * queue, radio_packet_t ** packet)
 {
+    if (packet_queue_is_full(queue))
+        return NO_MEMORY;
+
+    *packet = &queue->packets[queue->tail];
+
+    queue->tail = (queue->tail + 1u) % PACKET_QUEUE_SIZE;
+
+    return SUCCESS;
 }
 
 uint32_t packet_queue_add(packet_queue_t * queue, radio_packet_t * packet)
 {
-    if (packet_queue_is_full(queue))
-        return NO_MEMORY;
+    uint32_t err_code;
+    radio_packet_t * new_packet;
 
-    memcpy(&queue->packets[queue->tail], packet, sizeof(*packet));
+    err_code = packet_queue_new(queue, &new_packet);
+    if (err_code != SUCCESS)
+        return err_code;
 
-    queue->tail = (queue->tail + 1u) % PACKET_QUEUE_SIZE;
+    memcpy(new_packet, packet, sizeof(*packet));
 
     return SUCCESS;
 }

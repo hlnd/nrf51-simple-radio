@@ -46,6 +46,11 @@ int main(void)
         err_code = radio_send(&packet);
         ASSUME_SUCCESS(err_code);
 
+        packet.data[0] = i++;
+        packet.data[1] = 0x12;
+        err_code = radio_send(&packet);
+        ASSUME_SUCCESS(err_code);
+
         led_toggle(LED0);
         nrf_delay_us(1000000);
     }

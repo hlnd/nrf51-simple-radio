@@ -46,7 +46,7 @@ TEST(packet_queue, test_queue_full_queue_is_full)
 {
     LONGS_EQUAL(false, packet_queue_is_full(&queue));
 
-    for (int i = 0; i < PACKET_QUEUE_SIZE; i++)
+    for (int i = 0; i < PACKET_QUEUE_ELEMENTS; i++)
     {
         radio_packet_t packet;
         packet_queue_add(&queue, &packet);
@@ -76,10 +76,10 @@ TEST(packet_queue, test_queue_add_succeeds_on_non_empty_queue)
 
 TEST(packet_queue, test_queue_add_fails_on_full_queue)
 {
-    for (int i = 0; i < PACKET_QUEUE_SIZE; i++)
+    for (int i = 0; i < PACKET_QUEUE_ELEMENTS; i++)
     {
         radio_packet_t packet;
-        packet_queue_add(&queue, &packet);
+        LONGS_EQUAL(SUCCESS, packet_queue_add(&queue, &packet));
     }
 
     radio_packet_t packet;

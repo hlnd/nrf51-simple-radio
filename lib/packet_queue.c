@@ -38,12 +38,12 @@ uint32_t packet_queue_add(packet_queue_t * queue, radio_packet_t * packet)
     return SUCCESS;
 }
 
-uint32_t packet_queue_get(packet_queue_t * queue, radio_packet_t ** pp_packet)
+uint32_t packet_queue_get(packet_queue_t * queue, radio_packet_t ** packet)
 {
     if (packet_queue_is_empty(queue))
         return NOT_FOUND;
 
-    *pp_packet = &queue->packets[queue->head];
+    *packet = &queue->packets[queue->head];
 
     queue->head++;
 

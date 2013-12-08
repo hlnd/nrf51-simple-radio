@@ -154,10 +154,4 @@ TEST(packet_queue, test_queue_is_fifo)
     LONGS_EQUAL(0, memcmp(out_packets[5], &in_packets[5], sizeof(in_packets[5])));
     CHECK(0 != out_packets[6]);
     LONGS_EQUAL(0, memcmp(out_packets[6], &in_packets[6], sizeof(in_packets[6])));
-    CHECK(0 != out_packets[7]);
-    LONGS_EQUAL(0, memcmp(out_packets[7], &in_packets[7], sizeof(in_packets[7])));
-    CHECK(0 != out_packets[8]);
-    LONGS_EQUAL(0, memcmp(out_packets[8], &in_packets[8], sizeof(in_packets[8])));
-    CHECK(0 != out_packets[9]);
-    LONGS_EQUAL(0, memcmp(out_packets[9], &in_packets[9], sizeof(in_packets[9])));
 }

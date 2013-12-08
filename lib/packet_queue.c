@@ -26,6 +26,10 @@ bool packet_queue_is_full(packet_queue_t * queue)
     return (queue->tail - queue->head) == (PACKET_QUEUE_SIZE - 1);
 }
 
+uint32_t packet_queue_new(packet_queue_t * queue, radio_packet_t ** packet)
+{
+}
+
 uint32_t packet_queue_add(packet_queue_t * queue, radio_packet_t * packet)
 {
     if (packet_queue_is_full(queue))

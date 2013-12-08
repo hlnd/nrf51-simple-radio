@@ -59,10 +59,13 @@ void RADIO_IRQHandler(void)
         if (m_state == RX_PACKET_RECEIVE)
         {
             radio_packet_t * tx_packet;
-            err_code = packet_queue_get(&m_tx_queue, &tx_packet);
+            err_code = packet_queue_new(&m_tx_queue, &tx_packet);
             ASSUME_SUCCESS(err_code);
 
             tx_packet->flags.ack = 1;
+
+            err_code = packet_queue_get(&m_tx_queue, &tx_packet);
+            ASSUME_SUCCESS(err_code);
 
             NRF_RADIO->PACKETPTR = (uint32_t) tx_packet;
 

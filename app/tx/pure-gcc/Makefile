@@ -18,9 +18,14 @@ TEMPLATE_PATH = $(HOME)/Projects/nrf51-pure-gcc-setup/template/
 
 LIBRARY_PATHS = ../../../lib/
 SOURCE_PATHS = ../../../lib/
+TEST_PATH = ../../../tests/
 
 CFLAGS = -g
 
 GDB_PORT_NUMBER = 2334
 
 include $(TEMPLATE_PATH)Makefile
+
+check:
+	$(MAKE) -C$(TEST_PATH)
+

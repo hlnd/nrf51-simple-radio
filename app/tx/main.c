@@ -29,6 +29,7 @@ void radio_evt_handler(radio_evt_t * evt)
 int main(void)
 {
     uint8_t i = 0; 
+    uint32_t err_code;
 
     radio_packet_t packet;
     packet.len = 4;
@@ -42,7 +43,13 @@ int main(void)
     {
         packet.data[0] = i++;
         packet.data[1] = 0x12;
-        radio_send(&packet);
+        err_code = radio_send(&packet);
+        ASSUME_SUCCESS(err_code);
+
+        packet.data[0] = i++;
+        packet.data[1] = 0x12;
+        err_code = radio_send(&packet);
+        ASSUME_SUCCESS(err_code);
 
         gpio_pin_toggle(LED0);
         nrf_delay_us(1000000);

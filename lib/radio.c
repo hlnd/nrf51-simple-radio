@@ -1,6 +1,5 @@
 #include "radio.h"
 
-#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -61,19 +60,19 @@ void RADIO_IRQHandler(void)
         {
             radio_packet_t * tx_packet;
             err_code = packet_queue_get(&m_tx_queue, &tx_packet);
-            assert(err_code == SUCCESS);
+            ASSUME_SUCCESS(err_code);
 
             tx_packet->flags.ack = 1;
 
             NRF_RADIO->PACKETPTR = (uint32_t) tx_packet;
 
             err_code = packet_queue_add(&m_rx_queue, &m_rx_packet);
-            assert(err_code == SUCCESS);
+            ASSUME_SUCCESS(err_code);
 
             radio_evt_t evt;
             evt.type = PACKET_RECEIVED;
             err_code = packet_queue_get(&m_rx_queue, &evt.packet);
-            assert(err_code == SUCCESS);
+            ASSUME_SUCCESS(err_code);
 
             (*m_evt_handler)(&evt);
         }

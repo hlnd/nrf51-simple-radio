@@ -2,6 +2,7 @@
 APPLICATION_SRCS = $(notdir $(wildcard ../*.c))  
 APPLICATION_SRCS += nrf_delay.c
 APPLICATION_SRCS += radio.c
+APPLICATION_SRCS += packet_queue.c
 
 # Use shell to find name of root folder. Possible but horrible to do in make.
 PROJECT_NAME = $(shell basename "$(realpath ../)")

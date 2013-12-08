@@ -41,7 +41,10 @@ void RADIO_IRQHandler(void)
                 break;
 
             case TX_ACK_RECEIVE:
-                m_state = IDLE;
+                if (packet_queue_is_empty(&m_tx_queue))
+                    m_state = IDLE;
+                else
+                    m_state = TX_PACKET_SEND;
                 break;
 
             case RX_PACKET_RECEIVE:

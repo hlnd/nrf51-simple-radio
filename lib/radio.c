@@ -155,7 +155,7 @@ uint32_t radio_send(radio_packet_t * packet)
     uint32_t err_code;
 
     if (m_state != IDLE)
-        return SUCCESS;
+        return ERROR_BUSY;
 
     m_state = TX_PACKET_SEND;
 

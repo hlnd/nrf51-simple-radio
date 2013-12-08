@@ -62,6 +62,14 @@ TEST(packet_queue, test_queue_full_queue_is_full)
     LONGS_EQUAL(true, packet_queue_is_full(&queue));
 }
 
+TEST(packet_queue, test_queue_new_succeeds_on_empty_queue)
+{
+    radio_packet_t * packet = 0;
+    LONGS_EQUAL(SUCCESS, packet_queue_new(&queue, &packet));
+
+    CHECK(0 != packet);
+}
+
 TEST(packet_queue, test_queue_add_succeeds_on_empty_queue)
 {
     radio_packet_t packet;

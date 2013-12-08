@@ -24,7 +24,24 @@ static radio_evt_handler_t * m_evt_handler;
 
 static packet_queue_t m_tx_queue;
 static packet_queue_t m_rx_queue;
+
+static radio_packet_t m_tx_packet;
 static radio_packet_t m_rx_packet;
+
+static void hfclk_start(void)
+{
+    NRF_CLOCK->TASKS_HFCLKSTART = 1;
+    while(!NRF_CLOCK->EVENTS_HFCLKSTARTED)
+    {
+    }
+}
+
+static void tx_packet_prepare(void)
+{
+    uint32_t err_code;
+    err_code = packet_queue_get(&m_tx_queue, &m_tx_packet);
+    ASSUME_SUCCESS(err_code);
+}
 
 void RADIO_IRQHandler(void)
 {
@@ -42,9 +59,14 @@ void RADIO_IRQHandler(void)
 
             case TX_ACK_RECEIVE:
                 if (packet_queue_is_empty(&m_tx_queue))
+                {
                     m_state = IDLE;
+                }
                 else
+                {
+                    tx_packet_prepare();
                     m_state = TX_PACKET_SEND;
+                }
                 break;
 
             case RX_PACKET_RECEIVE:
@@ -61,16 +83,8 @@ void RADIO_IRQHandler(void)
 
         if (m_state == RX_PACKET_RECEIVE)
         {
-            radio_packet_t * tx_packet;
-            err_code = packet_queue_new(&m_tx_queue, &tx_packet);
-            ASSUME_SUCCESS(err_code);
-
-            tx_packet->flags.ack = 1;
-
-            err_code = packet_queue_get(&m_tx_queue, &tx_packet);
-            ASSUME_SUCCESS(err_code);
-
-            NRF_RADIO->PACKETPTR = (uint32_t) tx_packet;
+            m_tx_packet.flags.ack = 1;
+            NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_packet;
 
             err_code = packet_queue_add(&m_rx_queue, &m_rx_packet);
             ASSUME_SUCCESS(err_code);
@@ -117,14 +131,6 @@ void RADIO_IRQHandler(void)
     }
 }
 
-static void hfclk_start(void)
-{
-    NRF_CLOCK->TASKS_HFCLKSTART = 1;
-    while(!NRF_CLOCK->EVENTS_HFCLKSTARTED)
-    {
-    }
-}
-
 uint32_t radio_init(radio_evt_handler_t * evt_handler)
 {
     m_evt_handler = evt_handler;
@@ -154,14 +160,14 @@ uint32_t radio_send(radio_packet_t * packet)
 {
     uint32_t err_code;
 
-    if (m_state != IDLE)
-        return ERROR_BUSY;
-
-    m_state = TX_PACKET_SEND;
-
     err_code = packet_queue_add(&m_tx_queue, packet);
     if (err_code != SUCCESS)
         return err_code;
+
+    if (m_state != IDLE)
+        return SUCCESS;
+
+    m_state = TX_PACKET_SEND;
 
     hfclk_start();
 
@@ -175,9 +181,7 @@ uint32_t radio_send(radio_packet_t * packet)
         RADIO_INTENSET_DISABLED_Enabled << RADIO_INTENSET_DISABLED_Pos;
     NVIC_EnableIRQ(RADIO_IRQn);
 
-    err_code = packet_queue_get(&m_tx_queue, (radio_packet_t **) &NRF_RADIO->PACKETPTR);
-    if (err_code != SUCCESS)
-        return err_code;
+    tx_packet_prepare();
 
     NRF_RADIO->TASKS_TXEN = 1;
 

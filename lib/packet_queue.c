@@ -23,43 +23,43 @@ bool packet_queue_is_empty(packet_queue_t * queue)
 
 bool packet_queue_is_full(packet_queue_t * queue)
 {
-    return (queue->tail - queue->head) == (PACKET_QUEUE_SIZE - 1);
+    return (queue->tail - queue->head) == (queue->size - 1);
 }
 
-uint32_t packet_queue_new(packet_queue_t * queue, radio_packet_t ** packet)
+uint32_t packet_queue_new(packet_queue_t * queue, uint8_t ** element)
 {
     if (packet_queue_is_full(queue))
         return ERROR_NO_MEMORY;
 
-    *packet = &queue->packets[queue->tail];
+    *element = &queue->elements[queue->tail * queue->element_size];
 
-    queue->tail = (queue->tail + 1u) % PACKET_QUEUE_SIZE;
+    queue->tail = (queue->tail + 1u) % queue->size;
 
     return SUCCESS;
 }
 
-uint32_t packet_queue_add(packet_queue_t * queue, radio_packet_t * packet)
+uint32_t packet_queue_add(packet_queue_t * queue, uint8_t * element)
 {
     uint32_t err_code;
-    radio_packet_t * new_packet;
+    uint8_t * new_element;
 
-    err_code = packet_queue_new(queue, &new_packet);
+    err_code = packet_queue_new(queue, &new_element);
     if (err_code != SUCCESS)
         return err_code;
 
-    memcpy(new_packet, packet, sizeof(*packet));
+    memcpy(new_element, element, queue->element_size);
 
     return SUCCESS;
 }
 
-uint32_t packet_queue_get(packet_queue_t * queue, radio_packet_t * packet)
+uint32_t packet_queue_get(packet_queue_t * queue, uint8_t * element)
 {
     if (packet_queue_is_empty(queue))
         return ERROR_NOT_FOUND;
 
-    memcpy(packet, &queue->packets[queue->head], sizeof(*packet));
+    memcpy(element, &queue->elements[queue->head * queue->element_size], queue->element_size);
 
-    queue->head = (queue->head + 1u) % PACKET_QUEUE_SIZE;
+    queue->head = (queue->head + 1u) % queue->size;
 
     return SUCCESS;
 }

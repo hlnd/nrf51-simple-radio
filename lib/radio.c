@@ -217,6 +217,7 @@ uint32_t radio_init(radio_evt_handler_t * evt_handler)
     NRF_RADIO->CRCINIT = 0xFFFF;
     NRF_RADIO->CRCPOLY = 0x11021;
 
+    NVIC_SetPriority(SWI0_IRQn, 2);
     NVIC_EnableIRQ(SWI0_IRQn);
 
     return SUCCESS;

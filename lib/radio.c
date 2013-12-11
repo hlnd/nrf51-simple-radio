@@ -204,7 +204,7 @@ uint32_t radio_init(radio_evt_handler_t * evt_handler)
     NRF_RADIO->PREFIX0 = 0xE7E7E7E7;
 
     NRF_RADIO->PCNF0 = 8 << RADIO_PCNF0_LFLEN_Pos | 
-        1 << RADIO_PCNF0_S0LEN_Pos;
+        8 << RADIO_PCNF0_S1LEN_Pos;
     NRF_RADIO->PCNF1 = 64 << RADIO_PCNF1_MAXLEN_Pos |
         4 << RADIO_PCNF1_BALEN_Pos;
 

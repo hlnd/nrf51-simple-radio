@@ -13,7 +13,7 @@ typedef enum
     PACKET_LOST,
 } radio_evt_type_t;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
     uint8_t len;
     struct __attribute__((packed))

@@ -61,7 +61,6 @@ int main(void)
         err_code = radio_send(&packet);
         ASSUME_SUCCESS(err_code);
 
-        led_toggle(LED0);
         nrf_delay_us(1000000);
     }
 }

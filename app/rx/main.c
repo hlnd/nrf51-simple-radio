@@ -44,7 +44,9 @@ int main(void)
 
     while (1)
     {
-        led_toggle(LED0);
+        led_on(LED0);
+        nrf_delay_us(1000);
+        led_off(LED0);
         nrf_delay_us(100000);
     }
 }

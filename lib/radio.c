@@ -162,6 +162,9 @@ uint32_t radio_init(radio_evt_handler_t * evt_handler)
     m_evt_handler = evt_handler;
     m_state = IDLE;
 
+    PACKET_QUEUE_INIT(m_rx_queue, 8, sizeof(radio_packet_t));
+    PACKET_QUEUE_INIT(m_tx_queue, 8, sizeof(radio_packet_t));
+
     NRF_RADIO->BASE0 = 0xE7E7E7E7;
     NRF_RADIO->PREFIX0 = 0xE7E7E7E7;
 

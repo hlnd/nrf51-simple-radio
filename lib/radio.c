@@ -89,6 +89,16 @@ void RADIO_IRQHandler(void)
                 break;
 
             case TX_ACK_RECEIVE:
+                if (m_rx_packet.flags.ack == 1)
+                    evt_type = PACKET_SENT;
+                else
+                    evt_type = PACKET_LOST;
+
+                err_code = packet_queue_add(&m_evt_queue, (uint8_t *) &evt_type);
+                ASSUME_SUCCESS(err_code);
+
+                NVIC_SetPendingIRQ(SWI0_IRQn);
+
                 if (packet_queue_is_empty(&m_tx_queue))
                 {
                     m_state = IDLE;

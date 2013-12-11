@@ -95,30 +95,26 @@ void RADIO_IRQHandler(void)
                 break;
 
             case RX_PACKET_RECEIVE:
+                err_code = packet_queue_add(&m_rx_queue, &m_rx_packet);
+                ASSUME_SUCCESS(err_code);
+
+                NVIC_SetPendingIRQ(SWI0_IRQn);
+
+                m_tx_packet.flags.ack = 1;
+                NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_packet;
+
                 m_state = RX_ACK_SEND;
                 break;
 
             case RX_ACK_SEND:
                 m_state = RX_PACKET_RECEIVE;
+
+                NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_packet;
+
                 break;
 
             case IDLE:
                 break;
-        }
-
-        if (m_state == RX_PACKET_RECEIVE)
-        {
-            m_tx_packet.flags.ack = 1;
-            NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_packet;
-
-            err_code = packet_queue_add(&m_rx_queue, &m_rx_packet);
-            ASSUME_SUCCESS(err_code);
-
-            NVIC_SetPendingIRQ(SWI0_IRQn);
-        }
-        else
-        {
-            NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_packet;
         }
     }
     if ((NRF_RADIO->EVENTS_DISABLED == 1) && (NRF_RADIO->INTENSET & RADIO_INTENSET_DISABLED_Msk))

@@ -111,16 +111,19 @@ void RADIO_IRQHandler(void)
                 break;
 
             case RX_PACKET_RECEIVE:
+                m_tx_packet.flags.ack = 0;
+
                 err_code = packet_queue_add(&m_rx_queue, (uint8_t *) &m_rx_packet);
-                ASSUME_SUCCESS(err_code);
+                if (err_code == SUCCESS)
+                {
+                    m_tx_packet.flags.ack = 1;
 
-                evt_type = PACKET_RECEIVED;
-                err_code = packet_queue_add(&m_evt_queue, (uint8_t *) &evt_type);
-                ASSUME_SUCCESS(err_code);
+                    evt_type = PACKET_RECEIVED;
+                    err_code = packet_queue_add(&m_evt_queue, (uint8_t *) &evt_type);
+                    ASSUME_SUCCESS(err_code);
 
-                NVIC_SetPendingIRQ(SWI0_IRQn);
-
-                m_tx_packet.flags.ack = 1;
+                    NVIC_SetPendingIRQ(SWI0_IRQn);
+                }
                 NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_packet;
 
                 m_state = RX_ACK_SEND;

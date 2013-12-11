@@ -83,6 +83,8 @@ void RADIO_IRQHandler(void)
         switch (m_state)
         {
             case TX_PACKET_SEND:
+                NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_packet;
+
                 m_state = TX_ACK_RECEIVE;
                 break;
 

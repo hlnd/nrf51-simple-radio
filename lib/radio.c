@@ -114,12 +114,7 @@ void RADIO_IRQHandler(void)
             err_code = packet_queue_add(&m_rx_queue, &m_rx_packet);
             ASSUME_SUCCESS(err_code);
 
-            radio_evt_t evt;
-            evt.type = PACKET_RECEIVED;
-            err_code = packet_queue_get(&m_rx_queue, &evt.packet);
-            ASSUME_SUCCESS(err_code);
-
-            (*m_evt_handler)(&evt);
+            NVIC_SetPendingIRQ(SWI0_IRQn);
         }
         else
         {
@@ -154,6 +149,18 @@ void RADIO_IRQHandler(void)
     }
 }
 
+void SWI0_IRQHandler(void)
+{
+    uint32_t err_code;
+
+    radio_evt_t evt;
+    evt.type = PACKET_RECEIVED;
+    err_code = packet_queue_get(&m_rx_queue, &evt.packet);
+    ASSUME_SUCCESS(err_code);
+
+    (*m_evt_handler)(&evt);
+}
+
 uint32_t radio_init(radio_evt_handler_t * evt_handler)
 {
     m_evt_handler = evt_handler;
@@ -175,6 +182,8 @@ uint32_t radio_init(radio_evt_handler_t * evt_handler)
 
     NRF_RADIO->CRCINIT = 0xFFFF;
     NRF_RADIO->CRCPOLY = 0x11021;
+
+    NVIC_EnableIRQ(SWI0_IRQn);
 
     return SUCCESS;
 }

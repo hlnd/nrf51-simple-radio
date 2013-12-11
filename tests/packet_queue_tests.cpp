@@ -63,6 +63,22 @@ TEST(packet_queue, test_queue_full_queue_is_full)
         packet_queue_add(&queue, (uint8_t *) &packet);
     }
     LONGS_EQUAL(true, packet_queue_is_full(&queue));
+
+    for (int i = 0; i < 3; i++)
+    {
+        radio_packet_t in_packet;
+        radio_packet_t out_packet;
+
+        packet_queue_add(&queue, (uint8_t *) &in_packet);
+        packet_queue_get(&queue, (uint8_t *) &out_packet);
+    }
+
+    for (int i = 0; i < TEST_QUEUE_ELEMENTS; i++)
+    {
+        radio_packet_t packet;
+        packet_queue_add(&queue, (uint8_t *) &packet);
+    }
+    LONGS_EQUAL(true, packet_queue_is_full(&queue));
 }
 
 TEST(packet_queue, test_queue_new_succeeds_on_empty_queue)

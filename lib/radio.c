@@ -67,6 +67,8 @@ static void tx_packet_prepare(void)
     uint32_t err_code;
     err_code = packet_queue_get(&m_tx_queue, (uint8_t *) &m_tx_packet);
     ASSUME_SUCCESS(err_code);
+
+    NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_packet;
 }
 
 void RADIO_IRQHandler(void)

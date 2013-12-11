@@ -56,6 +56,11 @@ static void hfclk_start(void)
     }
 }
 
+static void hfclk_stop(void)
+{
+    NRF_CLOCK->TASKS_HFCLKSTOP = 1;
+}
+
 static void tx_packet_prepare(void)
 {
     uint32_t err_code;

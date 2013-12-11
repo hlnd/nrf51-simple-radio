@@ -130,10 +130,9 @@ void RADIO_IRQHandler(void)
                 break;
 
             case RX_ACK_SEND:
-                m_state = RX_PACKET_RECEIVE;
-
                 NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_packet;
 
+                m_state = RX_PACKET_RECEIVE;
                 break;
 
             case IDLE:

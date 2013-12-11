@@ -23,7 +23,7 @@ bool packet_queue_is_empty(packet_queue_t * queue)
 
 bool packet_queue_is_full(packet_queue_t * queue)
 {
-    return (queue->tail - queue->head) == (queue->size - 1);
+    return ((queue->tail + 1) % queue->size) == queue->head;
 }
 
 uint32_t packet_queue_new(packet_queue_t * queue, uint8_t ** element)

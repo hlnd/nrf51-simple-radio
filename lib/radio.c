@@ -52,9 +52,10 @@ static radio_packet_t m_rx_packet;
 static void hfclk_start(void)
 {
     NRF_CLOCK->TASKS_HFCLKSTART = 1;
-    while(!NRF_CLOCK->EVENTS_HFCLKSTARTED)
+    while(NRF_CLOCK->EVENTS_HFCLKSTARTED != 1)
     {
     }
+    NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
 }
 
 static void hfclk_stop(void)
@@ -162,6 +163,7 @@ void RADIO_IRQHandler(void)
                 break;
 
             case IDLE:
+                hfclk_stop();
                 break;
         }
     }

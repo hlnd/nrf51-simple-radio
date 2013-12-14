@@ -248,6 +248,7 @@ uint32_t radio_send(radio_packet_t * packet)
 
     NRF_RADIO->INTENSET = RADIO_INTENSET_END_Enabled << RADIO_INTENSET_END_Pos | 
         RADIO_INTENSET_DISABLED_Enabled << RADIO_INTENSET_DISABLED_Pos;
+    NVIC_SetPriority(RADIO_IRQn, 0);
     NVIC_EnableIRQ(RADIO_IRQn);
 
     tx_packet_prepare();

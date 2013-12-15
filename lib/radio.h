@@ -4,7 +4,8 @@
 #include <stdint.h>
 
 #define RADIO_PACKET_MAX_LEN 64
-#define RADIO_PACKET_BUFFER_SIZE 1
+#define RADIO_PACKET_QUEUE_SIZE 8
+#define RADIO_EVT_QUEUE_SIZE 8
 
 typedef enum
 {

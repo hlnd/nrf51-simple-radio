@@ -90,6 +90,10 @@ void RADIO_IRQHandler(void)
                 break;
 
             case TX_ACK_RECEIVE:
+                NRF_TIMER0->TASKS_STOP = 1;
+                NRF_TIMER0->TASKS_CLEAR = 1;
+                NRF_TIMER0->INTENCLR = TIMER_INTENCLR_COMPARE1_Enabled << TIMER_INTENCLR_COMPARE1_Pos;
+
                 if (m_rx_packet.flags.ack == 1)
                     evt_type = PACKET_SENT;
                 else
@@ -169,6 +173,16 @@ void RADIO_IRQHandler(void)
     }
 }
 
+void TIMER0_IRQHandler(void)
+{
+    if (NRF_TIMER0->EVENTS_COMPARE[1] == 1 && NRF_TIMER0->INTENSET & (TIMER_INTENSET_COMPARE1_Msk))
+    {
+        NRF_TIMER0->EVENTS_COMPARE[1] = 0;
+
+        PREPARE_TX();
+        m_state = TX_PACKET_SEND;
+    }
+}
 void SWI0_IRQHandler(void)
 {
     uint32_t err_code;
@@ -251,9 +265,18 @@ uint32_t radio_send(radio_packet_t * packet)
     NVIC_SetPriority(RADIO_IRQn, 0);
     NVIC_EnableIRQ(RADIO_IRQn);
 
+    NRF_TIMER0->CC[1] = 1000;
+    NRF_TIMER0->SHORTS = TIMER_SHORTS_COMPARE1_CLEAR_Enabled << TIMER_SHORTS_COMPARE1_CLEAR_Pos;
+    NRF_TIMER0->INTENSET = TIMER_INTENSET_COMPARE1_Enabled << TIMER_INTENSET_COMPARE1_Pos;
+    NVIC_SetPriority(TIMER0_IRQn, 0);
+    NVIC_EnableIRQ(TIMER0_IRQn);
+
+    NRF_PPI->CHENSET = PPI_CHENSET_CH22_Enabled << PPI_CHENSET_CH22_Pos;
+
     tx_packet_prepare();
 
     NRF_RADIO->TASKS_TXEN = 1;
+    NRF_TIMER0->TASKS_START = 1;
 
     return SUCCESS;
 }

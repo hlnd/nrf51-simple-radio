@@ -49,6 +49,8 @@ static packet_queue_t m_evt_queue;
 static radio_packet_t m_tx_packet;
 static radio_packet_t m_rx_packet;
 
+static uint8_t m_tx_attempt;
+
 static void hfclk_start(void)
 {
     NRF_CLOCK->TASKS_HFCLKSTART = 1;
@@ -68,6 +70,8 @@ static void tx_packet_prepare(void)
     uint32_t err_code;
     err_code = packet_queue_get(&m_tx_queue, (uint8_t *) &m_tx_packet);
     ASSUME_SUCCESS(err_code);
+
+    m_tx_attempt = 0;
 
     NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_packet;
 }
@@ -175,12 +179,27 @@ void RADIO_IRQHandler(void)
 
 void TIMER0_IRQHandler(void)
 {
+    uint32_t err_code;
+
     if (NRF_TIMER0->EVENTS_COMPARE[1] == 1 && NRF_TIMER0->INTENSET & (TIMER_INTENSET_COMPARE1_Msk))
     {
         NRF_TIMER0->EVENTS_COMPARE[1] = 0;
 
-        PREPARE_TX();
-        m_state = TX_PACKET_SEND;
+        if (m_tx_attempt++ < RADIO_TX_ATTEMPT_MAX)
+        {
+            PREPARE_TX();
+            m_state = TX_PACKET_SEND;
+        } 
+        else
+        {
+            radio_evt_t evt;
+            evt.type = PACKET_LOST;
+
+            err_code = packet_queue_add(&m_evt_queue, &evt);
+            ASSUME_SUCCESS(err_code);
+
+            NVIC_SetPendingIRQ(SWI0_IRQn);
+        }
     }
 }
 void SWI0_IRQHandler(void)

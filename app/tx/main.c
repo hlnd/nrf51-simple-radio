@@ -32,6 +32,9 @@ void radio_evt_handler(radio_evt_t * evt)
         case PACKET_LOST:
             led_toggle(LED0);
             break;
+
+        default:
+            break;
     }
 
 }

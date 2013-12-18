@@ -5,4 +5,4 @@ int main(int ac, char ** av)
 	return CommandLineTestRunner::RunAllTests(ac, av);
 }
 
-IMPORT_TEST_GROUP(packet_queue);
+IMPORT_TEST_GROUP(queue);

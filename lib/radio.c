@@ -49,7 +49,7 @@ static queue_t m_evt_queue;
 static radio_packet_t m_tx_packet;
 static radio_packet_t m_rx_packet;
 
-static uint8_t m_tx_attempt;
+static uint8_t m_tx_attempt_count;
 
 static void hfclk_start(void)
 {
@@ -71,7 +71,7 @@ static void tx_packet_prepare(void)
     err_code = queue_get(&m_tx_queue, (uint8_t *) &m_tx_packet);
     ASSUME_SUCCESS(err_code);
 
-    m_tx_attempt = 0;
+    m_tx_attempt_count = 0;
 
     NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_packet;
 }
@@ -185,7 +185,7 @@ void TIMER0_IRQHandler(void)
     {
         NRF_TIMER0->EVENTS_COMPARE[1] = 0;
 
-        if (m_tx_attempt++ < RADIO_TX_ATTEMPT_MAX)
+        if (m_tx_attempt_count++ < RADIO_TX_ATTEMPT_MAX)
         {
             PREPARE_TX();
             m_state = TX_PACKET_SEND;

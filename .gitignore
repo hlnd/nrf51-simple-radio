@@ -5,6 +5,8 @@ tags
 *.jlink
 *.log
 *.o
+*.d
+*.lib
 tests/all_tests
 
 

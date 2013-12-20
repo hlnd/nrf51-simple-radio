@@ -4,7 +4,9 @@
 #include <string.h>
 
 #include "error.h"
-#include "queue.h"
+#include "evt_queue.h"
+#include "tx_queue.h"
+#include "rx_queue.h"
 
 #include "nrf51.h"
 #include "nrf51_bitfields.h"
@@ -40,12 +42,6 @@ typedef enum
 
 volatile static radio_state_t m_state;
 
-static radio_evt_handler_t * m_evt_handler;
-
-static queue_t m_tx_queue;
-static queue_t m_rx_queue;
-static queue_t m_evt_queue;
-
 static radio_packet_t m_tx_packet;
 static radio_packet_t m_rx_packet;
 
@@ -68,7 +64,7 @@ static void hfclk_stop(void)
 static void tx_packet_prepare(void)
 {
     uint32_t err_code;
-    err_code = queue_get(&m_tx_queue, (uint8_t *) &m_tx_packet);
+    err_code = tx_queue_get(&m_tx_packet);
     ASSUME_SUCCESS(err_code);
 
     m_tx_attempt_count = 0;
@@ -103,12 +99,9 @@ void RADIO_IRQHandler(void)
                 else
                     evt_type = PACKET_LOST;
 
-                err_code = queue_add(&m_evt_queue, (uint8_t *) &evt_type);
-                ASSUME_SUCCESS(err_code);
+                evt_queue_add(evt_type);
 
-                NVIC_SetPendingIRQ(SWI0_IRQn);
-
-                if (queue_is_empty(&m_tx_queue))
+                if (tx_queue_is_empty())
                 {
                     m_state = IDLE;
                 }
@@ -122,16 +115,12 @@ void RADIO_IRQHandler(void)
             case RX_PACKET_RECEIVE:
                 m_tx_packet.flags.ack = 0;
 
-                err_code = queue_add(&m_rx_queue, (uint8_t *) &m_rx_packet);
+                err_code = rx_queue_add(&m_rx_packet);
                 if (err_code == SUCCESS)
                 {
                     m_tx_packet.flags.ack = 1;
 
-                    evt_type = PACKET_RECEIVED;
-                    err_code = queue_add(&m_evt_queue, (uint8_t *) &evt_type);
-                    ASSUME_SUCCESS(err_code);
-
-                    NVIC_SetPendingIRQ(SWI0_IRQn);
+                    evt_queue_add(PACKET_RECEIVED);
                 }
                 NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_packet;
 
@@ -164,7 +153,7 @@ void RADIO_IRQHandler(void)
                 break;
 
             case TX_ACK_RECEIVE:
-                if (queue_is_empty(&m_tx_queue))
+                if (tx_queue_is_empty())
                     PREPARE_DISABLE();
                 else
                     PREPARE_TX();
@@ -179,8 +168,6 @@ void RADIO_IRQHandler(void)
 
 void TIMER0_IRQHandler(void)
 {
-    uint32_t err_code;
-
     if (NRF_TIMER0->EVENTS_COMPARE[1] == 1 && NRF_TIMER0->INTENSET & (TIMER_INTENSET_COMPARE1_Msk))
     {
         NRF_TIMER0->EVENTS_COMPARE[1] = 0;
@@ -192,48 +179,17 @@ void TIMER0_IRQHandler(void)
         } 
         else
         {
-            radio_evt_t evt;
-            evt.type = PACKET_LOST;
-
-            err_code = queue_add(&m_evt_queue, &evt);
-            ASSUME_SUCCESS(err_code);
-
-            NVIC_SetPendingIRQ(SWI0_IRQn);
+            evt_queue_add(PACKET_LOST);
         }
     }
 }
-void SWI0_IRQHandler(void)
-{
-    uint32_t err_code;
-
-    while (!queue_is_empty(&m_evt_queue))
-    {
-        radio_evt_t evt;
-
-        err_code = queue_get(&m_evt_queue, &evt.type);
-        ASSUME_SUCCESS(err_code);
-
-        switch (evt.type)
-        {
-            case PACKET_RECEIVED:
-                err_code = queue_get(&m_rx_queue, (uint8_t *) &evt.packet);
-                ASSUME_SUCCESS(err_code);
-                break;
-        }
-
-        (*m_evt_handler)(&evt);
-    }
-}
-
 uint32_t radio_init(radio_evt_handler_t * evt_handler)
 {
-    m_evt_handler = evt_handler;
     m_state = IDLE;
 
-    QUEUE_INIT(m_rx_queue, RADIO_PACKET_QUEUE_SIZE, sizeof(radio_packet_t));
-    QUEUE_INIT(m_tx_queue, RADIO_PACKET_QUEUE_SIZE, sizeof(radio_packet_t));
-
-    QUEUE_INIT(m_evt_queue, RADIO_EVT_QUEUE_SIZE, sizeof(radio_evt_type_t));
+    evt_queue_init(evt_handler);
+    tx_queue_init();
+    rx_queue_init();
 
     NRF_RADIO->BASE0 = 0xE7E7E7E7;
     NRF_RADIO->PREFIX0 = 0xE7E7E7E7;
@@ -252,9 +208,6 @@ uint32_t radio_init(radio_evt_handler_t * evt_handler)
     NRF_RADIO->CRCINIT = 0xFFFF;
     NRF_RADIO->CRCPOLY = 0x11021;
 
-    NVIC_SetPriority(SWI0_IRQn, 2);
-    NVIC_EnableIRQ(SWI0_IRQn);
-
     return SUCCESS;
 }
 
@@ -262,7 +215,7 @@ uint32_t radio_send(radio_packet_t * packet)
 {
     uint32_t err_code;
 
-    err_code = queue_add(&m_tx_queue, (uint8_t *) packet);
+    err_code = tx_queue_add(packet);
     if (err_code != SUCCESS)
         return err_code;
 

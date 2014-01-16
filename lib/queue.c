@@ -23,7 +23,7 @@ bool queue_is_empty(queue_t * queue)
 
 bool queue_is_full(queue_t * queue)
 {
-    return ((queue->tail + 1) % queue->size) == queue->head;
+    return ((queue->tail + 1u) % queue->size) == queue->head;
 }
 
 uint32_t queue_new(queue_t * queue, uint8_t ** element)

@@ -5,6 +5,7 @@
 
 #include "error.h"
 #include "evt_queue.h"
+#include "packet_timer.h"
 #include "tx_queue.h"
 #include "rx_queue.h"
 
@@ -47,16 +48,6 @@ static radio_packet_t m_rx_packet;
 
 static uint8_t m_tx_attempt_count;
 
-static void hfclk_start(void)
-{
-    NRF_CLOCK->TASKS_HFCLKSTART = 1;
-}
-
-static void hfclk_stop(void)
-{
-    NRF_CLOCK->TASKS_HFCLKSTOP = 1;
-}
-
 static void tx_packet_prepare(void)
 {
     uint32_t err_code;
@@ -86,9 +77,7 @@ void RADIO_IRQHandler(void)
                 break;
 
             case TX_ACK_RECEIVE:
-                NRF_TIMER0->TASKS_STOP = 1;
-                NRF_TIMER0->TASKS_CLEAR = 1;
-                NRF_TIMER0->INTENCLR = TIMER_INTENCLR_COMPARE1_Enabled << TIMER_INTENCLR_COMPARE1_Pos;
+                packet_timer_evt_handler(PACKET_TIMER_EVT_PACKET_RX);
 
                 if (m_rx_packet.flags.ack == 1)
                     evt_type = PACKET_SENT;
@@ -156,29 +145,25 @@ void RADIO_IRQHandler(void)
                 break;
 
             case IDLE:
-                hfclk_stop();
+                packet_timer_event_stop();
                 break;
         }
     }
 }
 
-void TIMER0_IRQHandler(void)
+void on_packet_timer_timeout(void)
 {
-    if (NRF_TIMER0->EVENTS_COMPARE[1] == 1 && NRF_TIMER0->INTENSET & (TIMER_INTENSET_COMPARE1_Msk))
+    if (m_tx_attempt_count++ < RADIO_TX_ATTEMPT_MAX)
     {
-        NRF_TIMER0->EVENTS_COMPARE[1] = 0;
-
-        if (m_tx_attempt_count++ < RADIO_TX_ATTEMPT_MAX)
-        {
-            PREPARE_TX();
-            m_state = TX_PACKET_SEND;
-        } 
-        else
-        {
-            evt_queue_add(PACKET_LOST);
-        }
+        PREPARE_TX();
+        m_state = TX_PACKET_SEND;
+    } 
+    else
+    {
+        evt_queue_add(PACKET_LOST);
     }
 }
+
 uint32_t radio_init(radio_evt_handler_t * evt_handler)
 {
     m_state = IDLE;
@@ -220,7 +205,7 @@ uint32_t radio_send(radio_packet_t * packet)
 
     m_state = TX_PACKET_SEND;
 
-    hfclk_start();
+    packet_timer_tx_prepare(on_packet_timer_timeout);
 
     NRF_RADIO->RXADDRESSES = RADIO_RXADDRESSES_ADDR0_Enabled << RADIO_RXADDRESSES_ADDR0_Pos;
 
@@ -233,24 +218,9 @@ uint32_t radio_send(radio_packet_t * packet)
     NVIC_SetPriority(RADIO_IRQn, 0);
     NVIC_EnableIRQ(RADIO_IRQn);
 
-    NRF_TIMER0->PRESCALER = 4;
-
-    NRF_TIMER0->CC[0] = 1500;
-    NRF_TIMER0->CC[1] = 2000;
-    NRF_TIMER0->SHORTS = TIMER_SHORTS_COMPARE1_CLEAR_Enabled << TIMER_SHORTS_COMPARE1_CLEAR_Pos;
-    NRF_TIMER0->INTENSET = TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos | 
-                           TIMER_INTENSET_COMPARE1_Enabled << TIMER_INTENSET_COMPARE1_Pos;
-    NVIC_SetPriority(TIMER0_IRQn, 0);
-    NVIC_EnableIRQ(TIMER0_IRQn);
-
-    // CH20: TIMER0->EVENTS_COMPARE[0] -> RADIO->TASKS_TXEN
-    // CH22: TIMER0->EVENTS_COMPARE[1] -> RADIO->TASKS_DISABLE
-    NRF_PPI->CHENSET = PPI_CHENSET_CH20_Enabled << PPI_CHENSET_CH20_Pos |
-                       PPI_CHENSET_CH22_Enabled << PPI_CHENSET_CH22_Pos;
-
     tx_packet_prepare();
 
-    NRF_TIMER0->TASKS_START = 1;
+    packet_timer_event_start();
 
     return SUCCESS;
 }

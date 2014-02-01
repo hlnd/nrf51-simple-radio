@@ -46,6 +46,16 @@ void packet_timer_evt_handler(packet_timer_evt_t evt)
     }
 }
 
+void packet_timer_rx_prepare(void)
+{
+    hfclk_start();
+
+    NRF_TIMER0->CC[0] = 1500;
+    NRF_TIMER0->SHORTS = TIMER_SHORTS_COMPARE0_CLEAR_Enabled << TIMER_SHORTS_COMPARE0_CLEAR_Pos;
+
+    // CH21: TIMER0->EVENTS_COMPARE[0] -> RADIO->TASKS_RXEN
+    NRF_PPI->CHENSET = PPI_CHENSET_CH21_Enabled << PPI_CHENSET_CH21_Pos;
+}
 
 void packet_timer_tx_prepare(packet_timer_timeout_callback * timeout_callback)
 {

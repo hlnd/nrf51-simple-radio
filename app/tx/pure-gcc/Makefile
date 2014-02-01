@@ -13,8 +13,8 @@ SEGGER_SERIAL = 480200976
 
 #USE_SOFTDEVICE = S110
 
-SDK_PATH = $(HOME)/Projects/nrf51/nrf51822/
-TEMPLATE_PATH = $(HOME)/Projects/nrf51-pure-gcc-setup/template/
+SDK_PATH ?= $(HOME)/Projects/nrf51/nrf51822/
+TEMPLATE_PATH ?= $(HOME)/Projects/nrf51-pure-gcc-setup/template/
 
 LIB_PATH = ../../../lib/
 

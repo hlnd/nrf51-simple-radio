@@ -263,7 +263,7 @@ uint32_t radio_receive_start(void)
 {
     m_state = RX_PACKET_RECEIVE;
 
-    hfclk_start();
+    NRF_CLOCK->TASKS_HFCLKSTART = 1;
 
     NRF_RADIO->RXADDRESSES = RADIO_RXADDRESSES_ADDR0_Enabled << RADIO_RXADDRESSES_ADDR0_Pos;
 
@@ -276,7 +276,12 @@ uint32_t radio_receive_start(void)
     NVIC_EnableIRQ(RADIO_IRQn);
 
     NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_packet;
-    NRF_RADIO->TASKS_RXEN = 1;
+
+    NRF_TIMER0->CC[0] = 1500;
+    NRF_TIMER0->SHORTS = TIMER_SHORTS_COMPARE0_CLEAR_Enabled << TIMER_SHORTS_COMPARE0_CLEAR_Pos;
+
+    // CH21: TIMER0->EVENTS_COMPARE[0] -> RADIO->TASKS_RXEN
+    NRF_PPI->CHENSET = PPI_CHENSET_CH21_Enabled << PPI_CHENSET_CH21_Pos;
 
     return SUCCESS;
 }

@@ -10,6 +10,10 @@
     if (ERR_CODE != SUCCESS) \
         error_handler(ERR_CODE, __LINE__, __FILE__);
 
+#define ASSUME(CONDITION) \
+    if (!(CONDITION)) \
+        error_handler(CONDITION, __LINE__, __FILE__);
+
 void error_handler(uint32_t err_code, uint32_t line_num, char * file_name);
 
 #endif

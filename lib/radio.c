@@ -50,10 +50,6 @@ static uint8_t m_tx_attempt_count;
 static void hfclk_start(void)
 {
     NRF_CLOCK->TASKS_HFCLKSTART = 1;
-    while(NRF_CLOCK->EVENTS_HFCLKSTARTED != 1)
-    {
-    }
-    NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
 }
 
 static void hfclk_stop(void)
@@ -224,7 +220,7 @@ uint32_t radio_send(radio_packet_t * packet)
 
     m_state = TX_PACKET_SEND;
 
-    NRF_CLOCK->TASKS_HFCLKSTART = 1;
+    hfclk_start();
 
     NRF_RADIO->RXADDRESSES = RADIO_RXADDRESSES_ADDR0_Enabled << RADIO_RXADDRESSES_ADDR0_Pos;
 
@@ -263,7 +259,7 @@ uint32_t radio_receive_start(void)
 {
     m_state = RX_PACKET_RECEIVE;
 
-    NRF_CLOCK->TASKS_HFCLKSTART = 1;
+    hfclk_start();
 
     NRF_RADIO->RXADDRESSES = RADIO_RXADDRESSES_ADDR0_Enabled << RADIO_RXADDRESSES_ADDR0_Pos;
 

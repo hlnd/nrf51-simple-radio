@@ -11,9 +11,14 @@
 
 typedef enum
 {
+    NA,
     PACKET_RECEIVED,
     PACKET_SENT,
     PACKET_LOST,
+    BUTTON0_ON,
+    BUTTON0_OFF,
+    BUTTON1_ON,
+    BUTTON1_OFF,
 } radio_evt_type_t;
 
 typedef struct __attribute__((packed))

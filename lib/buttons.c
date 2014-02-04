@@ -81,8 +81,8 @@ void GPIOTE_IRQHandler(void)
         button0_state = button_state(BUTTON0);
         if (!in_debounce[0])
         {
-            if (button0_state && !prev_button0_state) evt_queue_add(BUTTON0_OFF);
-            if (!button0_state && prev_button0_state) evt_queue_add(BUTTON0_ON);
+            if (button0_state && !prev_button0_state) (*m_evt_handler)(BUTTON0, button0_state);
+            if (!button0_state && prev_button0_state) (*m_evt_handler)(BUTTON0, button0_state);
             
             if (prev_button0_state != button0_state)
             {
@@ -99,8 +99,8 @@ void GPIOTE_IRQHandler(void)
         button1_state = button_state(BUTTON1);
         if (!in_debounce[1])
         {
-            if (button1_state && !prev_button1_state) evt_queue_add(BUTTON1_OFF);
-            if (!button1_state && prev_button1_state) evt_queue_add(BUTTON1_ON);
+            if (button1_state && !prev_button1_state) (*m_evt_handler)(BUTTON1, button1_state);
+            if (!button1_state && prev_button1_state) (*m_evt_handler)(BUTTON1, button1_state);
             
             if (prev_button1_state != button1_state)
             {

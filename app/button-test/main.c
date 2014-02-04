@@ -18,9 +18,14 @@ void error_handler(uint32_t err_code, uint32_t line_num, char * file_name)
     }
 }
 
+void button_evt_handler(uint8_t pin_number, bool is_pressed)
+{
+
+}
+
 int main(void)
 {
-    buttons_init();
+    buttons_init(button_evt_handler);
     leds_init();
 
     while (1)

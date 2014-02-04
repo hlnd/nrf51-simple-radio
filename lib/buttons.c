@@ -12,8 +12,12 @@ static uint32_t button1_state;
 
 static volatile bool in_debounce[2] = {false, false};
 
-void buttons_init(void)
+static button_evt_handler_t m_evt_handler;
+
+void buttons_init(button_evt_handler_t evt_handler)
 {
+    m_evt_handler = evt_handler;
+
     nrf_gpio_cfg_input(BUTTON0, NRF_GPIO_PIN_PULLUP);
     nrf_gpio_cfg_input(BUTTON1, NRF_GPIO_PIN_PULLUP);
     nrf_gpiote_event_config(0, BUTTON0, NRF_GPIOTE_POLARITY_TOGGLE);

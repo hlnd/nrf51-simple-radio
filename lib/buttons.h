@@ -10,6 +10,8 @@
 #define DEBOUNCE_TIME_US_BUTTON0 (5000)
 #define DEBOUNCE_TIME_US_BUTTON1 (5000)
 
+typedef void (*button_evt_handler_t)(uint8_t pin_no, bool is_pressed);
+
 //typedef enum
 //{
 //    BUTTON0_ON,
@@ -24,7 +26,7 @@ typedef enum
     BUTTON1 = BUTTON1_PIN,
 } button_t;
 
-void buttons_init(void);
+void buttons_init(button_evt_handler_t evt_handler);
 
 
 

@@ -20,6 +20,16 @@ void error_handler(uint32_t err_code, uint32_t line_num, char * file_name)
 
 void button_evt_handler(uint8_t pin_number, bool is_pressed)
 {
+    switch (pin_number)
+    {
+        case BUTTON0:
+            gpio_pin_toggle(LED0);
+            break;
+
+        case BUTTON1:
+            gpio_pin_toggle(LED1);
+            break;
+    }
 
 }
 
@@ -30,7 +40,6 @@ int main(void)
 
     while (1)
     {
-        led_toggle(LED0);
         nrf_delay_us(100000);
     }
 }

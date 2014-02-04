@@ -3,7 +3,7 @@
 #include "nrf51.h"
 #include "nrf51_bitfields.h"
 
-packet_timer_timeout_callback * m_timeout_callback;
+packet_timer_timeout_callback m_timeout_callback;
 
 
 void TIMER0_IRQHandler(void)
@@ -12,7 +12,7 @@ void TIMER0_IRQHandler(void)
     {
         NRF_TIMER0->EVENTS_COMPARE[1] = 0;
 
-        m_timeout_callback();
+        (*m_timeout_callback)();
     }
 }
 
@@ -57,7 +57,7 @@ void packet_timer_rx_prepare(void)
     NRF_PPI->CHENSET = PPI_CHENSET_CH21_Enabled << PPI_CHENSET_CH21_Pos;
 }
 
-void packet_timer_tx_prepare(packet_timer_timeout_callback * timeout_callback)
+void packet_timer_tx_prepare(packet_timer_timeout_callback timeout_callback)
 {
     m_timeout_callback = timeout_callback;
 

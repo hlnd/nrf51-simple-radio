@@ -11,9 +11,9 @@ typedef enum
 
 void packet_timer_evt_handler(packet_timer_evt_t * evt);
 
-void packet_timer_event_tx_prepare(packet_timer_timeout_callback * timeout_callback);
+void packet_timer_tx_prepare(packet_timer_timeout_callback timeout_callback);
 
-void packet_timer_event_rx_prepare(void);
+void packet_timer_rx_prepare(void);
 
 void packet_timer_event_start(void);
 

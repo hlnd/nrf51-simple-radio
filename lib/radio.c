@@ -160,6 +160,7 @@ void on_packet_timer_timeout(void)
     } 
     else
     {
+        packet_timer_event_stop();
         evt_queue_add(PACKET_LOST);
     }
 }

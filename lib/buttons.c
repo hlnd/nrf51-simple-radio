@@ -1,8 +1,6 @@
 #include "buttons.h"
 #include "nrf_gpiote.h"
 #include "nrf_gpio.h"
-#include "radio.h"
-#include "evt_queue.h"
 #include "nrf.h"
 
 static uint32_t prev_button0_state = 1;

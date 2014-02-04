@@ -1,6 +1,5 @@
 #include "buttons.h"
 #include "nrf_gpiote.h"
-#include "nrf_gpio.h"
 #include "nrf.h"
 
 static uint32_t prev_button0_state = 1;
@@ -16,8 +15,8 @@ void buttons_init(button_evt_handler_t evt_handler)
 {
     m_evt_handler = evt_handler;
 
-    nrf_gpio_cfg_input(BUTTON0, NRF_GPIO_PIN_PULLUP);
-    nrf_gpio_cfg_input(BUTTON1, NRF_GPIO_PIN_PULLUP);
+    gpio_pin_cfg_in(BUTTON0, GPIO_PULL_UP, GPIO_SENSE_LOW);
+    gpio_pin_cfg_in(BUTTON1, GPIO_PULL_UP, GPIO_SENSE_LOW);
     nrf_gpiote_event_config(0, BUTTON0, NRF_GPIOTE_POLARITY_TOGGLE);
     nrf_gpiote_event_config(1, BUTTON1, NRF_GPIOTE_POLARITY_TOGGLE);
         

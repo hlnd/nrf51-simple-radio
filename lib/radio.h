@@ -3,7 +3,10 @@
 
 #include <stdint.h>
 
+#ifdef __CC_ARM
 #pragma anon_unions
+#endif
+
 #define RADIO_PACKET_MAX_LEN 64
 #define RADIO_PACKET_QUEUE_SIZE 8
 #define RADIO_EVT_QUEUE_SIZE 8

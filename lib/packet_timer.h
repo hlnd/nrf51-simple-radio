@@ -9,7 +9,7 @@ typedef enum
 } packet_timer_evt_t;
 
 
-void packet_timer_evt_handler(packet_timer_evt_t * evt);
+void packet_timer_evt_handler(packet_timer_evt_t evt);
 
 void packet_timer_tx_prepare(packet_timer_timeout_callback timeout_callback);
 

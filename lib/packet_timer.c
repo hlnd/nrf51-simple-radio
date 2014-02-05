@@ -6,15 +6,6 @@
 packet_timer_timeout_callback m_timeout_callback;
 
 
-void TIMER0_IRQHandler(void)
-{
-    if (NRF_TIMER0->EVENTS_COMPARE[1] == 1 && NRF_TIMER0->INTENSET & (TIMER_INTENSET_COMPARE1_Msk))
-    {
-        NRF_TIMER0->EVENTS_COMPARE[1] = 0;
-
-        (*m_timeout_callback)();
-    }
-}
 
 static void hfclk_start(void)
 {

@@ -8,6 +8,7 @@ tags
 *.d
 *.lib
 *.dep
+JLinkLog.txt
 tests/all_tests
 
 

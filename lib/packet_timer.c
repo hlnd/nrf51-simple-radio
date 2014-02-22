@@ -6,6 +6,19 @@
 packet_timer_timeout_callback m_timeout_callback;
 
 
+void TIMER0_IRQHandler(void)
+{
+    if (NRF_TIMER0->EVENTS_COMPARE[0] == 1 && NRF_TIMER0->INTENSET & (TIMER_INTENSET_COMPARE0_Msk))
+    {
+        NRF_TIMER0->EVENTS_COMPARE[0] = 0;
+    }
+    if (NRF_TIMER0->EVENTS_COMPARE[1] == 1 && NRF_TIMER0->INTENSET & (TIMER_INTENSET_COMPARE1_Msk))
+    {
+        NRF_TIMER0->EVENTS_COMPARE[1] = 0;
+
+        (*m_timeout_callback)();
+    }
+}
 
 static void hfclk_start(void)
 {
@@ -17,15 +30,6 @@ static void hfclk_stop(void)
     NRF_CLOCK->TASKS_HFCLKSTOP = 1;
 }
 
-void TIMER0_IRQHandler(void)
-{
-    if (NRF_TIMER0->EVENTS_COMPARE[1] == 1 && NRF_TIMER0->INTENSET & (TIMER_INTENSET_COMPARE1_Msk))
-    {
-        NRF_TIMER0->EVENTS_COMPARE[1] = 0;
-
-        m_timeout_callback();
-    }
-}
 
 void packet_timer_evt_handler(packet_timer_evt_t evt)
 {

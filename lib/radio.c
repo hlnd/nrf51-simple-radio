@@ -105,16 +105,16 @@ void RADIO_IRQHandler(void)
                 break;
 
             case RX_PACKET_RECEIVE:
-                m_tx_packet.flags.ack = 0;
+                m_rx_packet.flags.ack = 0;
 
                 err_code = rx_queue_add(&m_rx_packet);
                 if (err_code == SUCCESS)
                 {
-                    m_tx_packet.flags.ack = 1;
+                    m_rx_packet.flags.ack = 1;
 
                     evt_queue_add(PACKET_RECEIVED);
                 }
-                NRF_RADIO->PACKETPTR = (uint32_t) &m_tx_packet;
+                NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_packet;
 
                 m_state = RX_ACK_SEND;
                 break;

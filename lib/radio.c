@@ -47,12 +47,13 @@ typedef enum
     TX_ACK_RECEIVE,
 } radio_state_t;
 
-volatile static radio_state_t m_state;
+volatile radio_state_t m_state;
 
 static radio_packet_t m_tx_packet;
 static radio_packet_t m_rx_packet;
 
-static uint8_t m_tx_attempt_count;
+volatile uint8_t m_tx_attempt_count;
+volatile bool tx_queue_is_empty_stored;
 
 static void tx_packet_prepare(void)
 {

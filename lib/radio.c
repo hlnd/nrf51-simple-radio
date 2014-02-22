@@ -239,6 +239,7 @@ uint32_t radio_send(radio_packet_t * packet)
 
         packet_timer_event_start();
 
+    }
     return SUCCESS;
 }
 
@@ -256,6 +257,8 @@ uint32_t radio_receive_start(void)
     NVIC_EnableIRQ(RADIO_IRQn);
 
     NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_packet;
+
+    packet_timer_event_start();
 
     return SUCCESS;
 }

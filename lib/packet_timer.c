@@ -64,7 +64,7 @@ void packet_timer_tx_prepare(packet_timer_timeout_callback timeout_callback)
     NRF_TIMER0->PRESCALER = 4;
 
     NRF_TIMER0->CC[0] = 1500;
-    NRF_TIMER0->CC[1] = 2000;
+    NRF_TIMER0->CC[1] = 4000;
     NRF_TIMER0->SHORTS = TIMER_SHORTS_COMPARE1_CLEAR_Enabled << TIMER_SHORTS_COMPARE1_CLEAR_Pos;
     NRF_TIMER0->INTENSET = TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos | 
                            TIMER_INTENSET_COMPARE1_Enabled << TIMER_INTENSET_COMPARE1_Pos;

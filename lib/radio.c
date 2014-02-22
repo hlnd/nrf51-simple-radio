@@ -208,24 +208,24 @@ uint32_t radio_send(radio_packet_t * packet)
     if (err_code != SUCCESS)
         return err_code;
 
-    if (m_state != IDLE)
-        return SUCCESS;
+    if (m_state == IDLE)
+    {
+        m_state = TX_PACKET_SEND;
 
-    m_state = TX_PACKET_SEND;
+        packet_timer_tx_prepare(on_packet_timer_timeout);
 
-    packet_timer_tx_prepare(on_packet_timer_timeout);
+        NRF_RADIO->RXADDRESSES = RADIO_RXADDRESSES_ADDR0_Enabled << RADIO_RXADDRESSES_ADDR0_Pos;
 
         PREPARE_RX();
-    NRF_RADIO->RXADDRESSES = RADIO_RXADDRESSES_ADDR0_Enabled << RADIO_RXADDRESSES_ADDR0_Pos;
 
         SETUP_INTERRUPTS();
+        
+        NVIC_SetPriority(RADIO_IRQn, 0);
+        NVIC_EnableIRQ(RADIO_IRQn);
 
-    NVIC_SetPriority(RADIO_IRQn, 0);
-    NVIC_EnableIRQ(RADIO_IRQn);
+        tx_packet_prepare();
 
-    tx_packet_prepare();
-
-    packet_timer_event_start();
+        packet_timer_event_start();
 
     return SUCCESS;
 }

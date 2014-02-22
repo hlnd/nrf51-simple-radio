@@ -53,6 +53,7 @@ static radio_packet_t m_tx_packet;
 static radio_packet_t m_rx_packet;
 
 volatile uint8_t m_tx_attempt_count;
+volatile uint32_t total_m_tx_attempts = 0;
 volatile bool tx_queue_is_empty_stored;
 
 static void tx_packet_prepare(void)
@@ -160,6 +161,7 @@ void RADIO_IRQHandler(void)
 
 void on_packet_timer_timeout(void)
 {
+    total_m_tx_attempts++;
     if (m_tx_attempt_count++ < RADIO_TX_ATTEMPT_MAX)
     {
         PREPARE_TX();

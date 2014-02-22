@@ -93,7 +93,7 @@ void RADIO_IRQHandler(void)
 
                 evt_queue_add(evt_type);
 
-                if (tx_queue_is_empty())
+                if (tx_queue_is_empty_stored)
                 {
                     m_state = IDLE;
                 }
@@ -132,7 +132,7 @@ void RADIO_IRQHandler(void)
     if ((NRF_RADIO->EVENTS_DISABLED == 1) && (NRF_RADIO->INTENSET & RADIO_INTENSET_DISABLED_Msk))
     {
         NRF_RADIO->EVENTS_DISABLED = 0; 
-
+        tx_queue_is_empty_stored = tx_queue_is_empty();
         switch (m_state)
         {
             case TX_PACKET_SEND:
@@ -145,7 +145,7 @@ void RADIO_IRQHandler(void)
                 break;
 
             case TX_ACK_RECEIVE:
-                if (tx_queue_is_empty())
+                if (tx_queue_is_empty_stored)
                     PREPARE_DISABLE();
                 else
                     PREPARE_TX();
@@ -167,8 +167,18 @@ void on_packet_timer_timeout(void)
     } 
     else
     {
-        packet_timer_event_stop();
+        if (tx_queue_is_empty_stored)
+        {
+            m_state = IDLE;
+            packet_timer_event_stop();
+        }
+        else
+        {
+            tx_packet_prepare();
+            m_state = TX_PACKET_SEND;
+        }
         evt_queue_add(PACKET_LOST);
+        
     }
 }
 

@@ -11,5 +11,6 @@ tags
 JLinkLog.txt
 *.uvgui*
 tests/all_tests
+*.bak
 
 

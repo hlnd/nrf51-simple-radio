@@ -41,17 +41,17 @@ void radio_evt_handler(radio_evt_t * evt)
 
 int main(void)
 {
-    radio_init(radio_evt_handler);
-
-    radio_receive_start();
+    static uint32_t err_code, temp;
+    err_code = radio_init(radio_evt_handler, 0);
+    ASSUME_SUCCESS(err_code);
 
     leds_init();
-    gpio_pins_cfg_out(0, 8);
 
     while (1)
     {
+        err_code = radio_start_rx();
         led_on(LED0);
-        nrf_delay_us(1000);
+        nrf_delay_us(50000);
         led_off(LED0);
         nrf_delay_us(100000);
     }

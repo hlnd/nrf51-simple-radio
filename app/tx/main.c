@@ -36,7 +36,7 @@ void radio_evt_handler(radio_evt_t * evt)
             n_packets_sent++;
             break;
 
-        case PACKET_LOST:
+        case PACKET_RECEIVED:
             led_toggle(LED0);
             n_packets_lost++;
             break;
@@ -54,23 +54,25 @@ int main(void)
 
     leds_init();
 
+    radio_packet_t initial_packet;
+    initial_packet.len = 4;
+
     radio_packet_t packet;
     packet.len = 4;
-    packet.flags.ack = 0;
 
-    radio_init(radio_evt_handler);
+    radio_init(radio_evt_handler, &initial_packet);
 
     while (1)
     {
         packet.data[0] = i++;
         packet.data[1] = 0x12;
+
         err_code = radio_send(&packet);
         ASSUME_SUCCESS(err_code);
 
-        packet.data[0] = i++;
-        packet.data[1] = 0x12;
-        err_code = radio_send(&packet);
-        ASSUME_SUCCESS(err_code);
+        nrf_delay_us(2000);
+
+        radio_stop_rx();
 
         nrf_delay_us(1000000);
     }

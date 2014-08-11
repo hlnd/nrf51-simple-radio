@@ -11,6 +11,12 @@ uint32_t rx_queue_get(radio_packet_t * packet);
 
 uint32_t rx_queue_add(radio_packet_t * packet);
 
+uint32_t rx_queue_new(radio_packet_t ** packet);
+
+uint32_t rx_queue_get_ptr(radio_packet_t ** packet);
+
+uint32_t rx_queue_ready(void);
+
 bool rx_queue_is_empty(void);
 
 #endif

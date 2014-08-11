@@ -35,4 +35,8 @@ uint32_t queue_add(queue_t * queue, uint8_t * packet);
 
 uint32_t queue_get(queue_t * queue, uint8_t * packet);
 
+uint32_t queue_get_ptr(queue_t * queue, uint8_t ** element);
+
+uint32_t queue_ready(queue_t * queue);
+
 #endif

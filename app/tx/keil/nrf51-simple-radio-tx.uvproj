@@ -454,9 +454,9 @@
               <FilePath>..\..\..\lib\tx_queue.c</FilePath>
             </File>
             <File>
-              <FileName>packet_timer.c</FileName>
+              <FileName>packet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\lib\packet_timer.c</FilePath>
+              <FilePath>..\..\..\lib\packet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -910,9 +910,9 @@
               <FilePath>..\..\..\lib\tx_queue.c</FilePath>
             </File>
             <File>
-              <FileName>packet_timer.c</FileName>
+              <FileName>packet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\lib\packet_timer.c</FilePath>
+              <FilePath>..\..\..\lib\packet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1366,9 +1366,9 @@
               <FilePath>..\..\..\lib\tx_queue.c</FilePath>
             </File>
             <File>
-              <FileName>packet_timer.c</FileName>
+              <FileName>packet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\lib\packet_timer.c</FilePath>
+              <FilePath>..\..\..\lib\packet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1822,9 +1822,9 @@
               <FilePath>..\..\..\lib\tx_queue.c</FilePath>
             </File>
             <File>
-              <FileName>packet_timer.c</FileName>
+              <FileName>packet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\lib\packet_timer.c</FilePath>
+              <FilePath>..\..\..\lib\packet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2278,9 +2278,9 @@
               <FilePath>..\..\..\lib\tx_queue.c</FilePath>
             </File>
             <File>
-              <FileName>packet_timer.c</FileName>
+              <FileName>packet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\lib\packet_timer.c</FilePath>
+              <FilePath>..\..\..\lib\packet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2734,9 +2734,9 @@
               <FilePath>..\..\..\lib\tx_queue.c</FilePath>
             </File>
             <File>
-              <FileName>packet_timer.c</FileName>
+              <FileName>packet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\lib\packet_timer.c</FilePath>
+              <FilePath>..\..\..\lib\packet.c</FilePath>
             </File>
           </Files>
         </Group>

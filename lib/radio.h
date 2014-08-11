@@ -2,14 +2,13 @@
 #define RADIO_H_INCLUDED
 
 #include <stdint.h>
+#include "packet.h"
 
 #ifdef __CC_ARM
 #pragma anon_unions
 #endif
 
-#define RADIO_PACKET_MAX_LEN 64
-#define RADIO_PACKET_QUEUE_SIZE 8
-#define RADIO_EVT_QUEUE_SIZE 8
+#define RADIO_EVT_QUEUE_SIZE 12
 #define RADIO_TX_ATTEMPT_MAX 3
 
 typedef enum
@@ -19,16 +18,6 @@ typedef enum
     PACKET_LOST,
 } radio_evt_type_t;
 
-typedef struct __attribute__((packed))
-{
-    uint8_t len;
-    struct __attribute__((packed))
-    {
-        uint8_t padding : 7;
-        uint8_t ack : 1;
-    } flags;
-    uint8_t data[RADIO_PACKET_MAX_LEN];
-} radio_packet_t;
 
 typedef struct
 {
@@ -41,8 +30,10 @@ typedef struct
 
 typedef void (radio_evt_handler_t)(radio_evt_t * evt);
 
-uint32_t radio_init(radio_evt_handler_t * evt_handler);
+uint32_t radio_init(radio_evt_handler_t * evt_handler, radio_packet_t * initial_packet);
+uint32_t radio_start_tx(void);
+uint32_t radio_start_rx(void);
+uint32_t radio_stop_rx(void);
 uint32_t radio_send(radio_packet_t * packet);
-uint32_t radio_receive_start(void);
 
 #endif

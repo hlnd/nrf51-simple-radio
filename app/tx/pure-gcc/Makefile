@@ -8,13 +8,13 @@ APPLICATION_LIBS += radio.lib
 PROJECT_NAME = $(shell basename "$(realpath ../)")
 
 DEVICE = NRF51
-BOARD = BOARD_PCA10001
-SEGGER_SERIAL = 480200976
+BOARD = BOARD_PCA10000
+SEGGER_SERIAL = 480107090
 
 #USE_SOFTDEVICE = S110
 
-SDK_PATH ?= $(HOME)/Projects/nrf51/nrf51822/
-TEMPLATE_PATH ?= $(HOME)/Projects/nrf51-pure-gcc-setup/template/
+SDK_PATH ?= /usr/lib/nRF51-SDK/nrf51822/
+TEMPLATE_PATH ?= ../../../../nrf51-pure-gcc-setup/template/
 
 LIB_PATH = ../../../lib/
 

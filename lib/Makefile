@@ -1,5 +1,6 @@
 RADIO_SRCS += radio.c
 RADIO_SRCS += queue.c
+RADIO_SRCS += packet.c
 RADIO_SRCS += evt_queue.c
 RADIO_SRCS += tx_queue.c
 RADIO_SRCS += rx_queue.c
